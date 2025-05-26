@@ -44,6 +44,11 @@
                     <span class="toggle-slider"></span>
                     <span id="trackingLabel">Cookie Tracking</span>
                 </label>
+                <label class="toggle ccpa-toggle">
+                    <input type="checkbox" id="ccpaOptOut">
+                    <span class="toggle-slider"></span>
+                    <span id="ccpaLabel">Do Not Sell My Info</span>
+                </label>
                 <button id="clearData" class="btn-secondary">Clear Data</button>
             </div>
         </div>
@@ -182,6 +187,9 @@
             if (window.location.port !== '3000') {
                 const baseUrl = 'http://localhost:3000';
                 document.querySelectorAll('img[src^="ad-images/"]').forEach(img => {
+                    img.src = baseUrl + '/' + img.getAttribute('src');
+                });
+                document.querySelectorAll('img[src^="product-images/"]').forEach(img => {
                     img.src = baseUrl + '/' + img.getAttribute('src');
                 });
             }

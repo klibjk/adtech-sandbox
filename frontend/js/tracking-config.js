@@ -121,6 +121,7 @@ class TrackingConfig {
             tracking_mode: this.trackingMode,
             timestamp: Date.now(),
             page_url: window.location.href,
+            ccpa_opt_out: sessionStorage.getItem('ccpa_opt_out') === 'true',
             ...eventData
         };
 

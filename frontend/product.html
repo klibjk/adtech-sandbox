@@ -300,6 +300,16 @@
         const urlParams = new URLSearchParams(window.location.search);
         const attribution = urlParams.get('utm_source') || urlParams.get('ref') || 'direct';
         window.attributionSource = attribution;
+        
+        // Fix image paths for cross-port compatibility
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.port !== '3000') {
+                const baseUrl = 'http://localhost:3000';
+                document.querySelectorAll('img[src^="product-images/"]').forEach(img => {
+                    img.src = baseUrl + '/' + img.getAttribute('src');
+                });
+            }
+        });
     </script>
     
     <!-- Core tracking scripts -->

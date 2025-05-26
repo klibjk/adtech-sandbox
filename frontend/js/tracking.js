@@ -32,6 +32,14 @@ class TrackingOrchestrator {
         }
 
 
+        // CCPA opt-out toggle
+        const ccpaToggle = document.getElementById('ccpaOptOut');
+        if (ccpaToggle) {
+            ccpaToggle.addEventListener('change', (event) => {
+                this.handleCcpaOptOutChange(event.target.checked);
+            });
+        }
+
         // Clear data button
         const clearDataBtn = document.getElementById('clearData');
         if (clearDataBtn) {
@@ -72,6 +80,36 @@ class TrackingOrchestrator {
         this.updateUserIdDisplay();
     }
 
+    handleCcpaOptOutChange(isOptedOut) {
+        console.log(`CCPA opt-out changed: ${isOptedOut}`);
+        
+        // Store preference in session storage
+        sessionStorage.setItem('ccpa_opt_out', isOptedOut.toString());
+        
+        // Send CCPA preference change event
+        window.trackingConfig.sendEvent('ccpa_preference_change', {
+            ccpa_opt_out: isOptedOut,
+            change_timestamp: Date.now(),
+            user_initiated: true
+        }).catch(console.error);
+
+        // Update tracking behavior based on preference
+        this.updateTrackingBehavior(isOptedOut);
+    }
+
+    updateTrackingBehavior(isOptedOut) {
+        if (isOptedOut) {
+            // Disable personal data collection/sharing
+            console.log('CCPA opt-out active: Restricting personal data collection');
+            // Here you would implement restrictions on:
+            // - Third-party data sharing
+            // - Personalized advertising
+            // - Cross-site tracking
+            // - Data aggregation for advertising purposes
+        } else {
+            console.log('CCPA opt-out inactive: Normal tracking enabled');
+        }
+    }
 
     handleClearData() {
         console.log('Clearing all tracking data');
@@ -216,6 +254,7 @@ class TrackingOrchestrator {
             sessionId: window.trackingConfig.sessionId,
             userId: window.trackingConfig.userId,
             trackingMode: window.trackingConfig.trackingMode,
+            ccpaOptOut: sessionStorage.getItem('ccpa_opt_out') === 'true',
             startTime: performance.timing.navigationStart
         };
     }
