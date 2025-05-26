@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Cat Cardboard Box - AdTech Analytics</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/product.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h1><a href="index.html">AdTech Analytics</a></h1>
+            <div class="copyright">© 2025 David A. Povis</div>
+        </div>
+        
+        <div class="header-center">
+            <div class="analytics-navbar">
+                <h3>Live Analytics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Events</span>
+                        <span id="totalEvents" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Views</span>
+                        <span id="adViews" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Clicks</span>
+                        <span id="adClicks" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Cart</span>
+                        <span id="cartItems" class="metric-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="controls">
+                <span class="attribution-info" id="attributionSource">Direct Visit</span>
+                <button id="simulateJourney" class="btn-secondary">Simulate Journey</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="product-main">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a href="index.html">Home</a> > <span>Cat Cardboard Box</span>
+        </nav>
+
+        <!-- Product Section -->
+        <section class="product-section">
+            <div class="product-image-container">
+                <img id="productImage" src="product-images/cat-cardboard-box.jpg" alt="Ultimate Cat Cardboard Box" class="product-image">
+                <div class="image-badges">
+                    <span class="badge featured">Featured</span>
+                    <span class="badge bestseller">Best Seller</span>
+                </div>
+            </div>
+
+            <div class="product-details">
+                <h1 class="product-title">Ultimate Cat Cardboard Box</h1>
+                <div class="product-rating">
+                    <span class="stars">★★★★★</span>
+                    <span class="rating-text">(247 reviews)</span>
+                </div>
+
+                <div class="product-price">
+                    <span class="current-price">$24.99</span>
+                    <span class="original-price">$34.99</span>
+                    <span class="discount">29% OFF</span>
+                </div>
+
+                <div class="product-description">
+                    <h3>Product Description</h3>
+                    <p>The ultimate entertainment solution for your feline friend! This premium cardboard box is crafted from high-quality, eco-friendly corrugated cardboard that provides hours of endless fun.</p>
+                    
+                    <ul class="features-list">
+                        <li>✓ Premium corrugated cardboard construction</li>
+                        <li>✓ Perfect size for cats of all ages</li>
+                        <li>✓ Eco-friendly and recyclable</li>
+                        <li>✓ Easy assembly - no tools required</li>
+                        <li>✓ Stimulates natural hiding instincts</li>
+                        <li>✓ Provides stress relief and comfort</li>
+                    </ul>
+                </div>
+
+                <div class="product-options">
+                    <div class="option-group">
+                        <label for="size">Size:</label>
+                        <select id="size" name="size">
+                            <option value="small">Small (12"x8"x8") - $19.99</option>
+                            <option value="medium" selected>Medium (16"x12"x10") - $24.99</option>
+                            <option value="large">Large (20"x16"x12") - $29.99</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="quantity">Quantity:</label>
+                        <div class="quantity-controls">
+                            <button type="button" class="qty-btn" onclick="decreaseQuantity()">-</button>
+                            <input type="number" id="quantity" value="1" min="1" max="10">
+                            <button type="button" class="qty-btn" onclick="increaseQuantity()">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="addToCart" class="btn-primary btn-large">
+                        Add to Cart - $<span id="totalPrice">24.99</span>
+                    </button>
+                    <button id="buyNow" class="btn-secondary btn-large">Buy Now</button>
+                </div>
+
+                <div class="shipping-info">
+                    <div class="shipping-item">
+                        <span class="shipping-icon">🚚</span>
+                        <span>Free shipping on orders over $25</span>
+                    </div>
+                    <div class="shipping-item">
+                        <span class="shipping-icon">📦</span>
+                        <span>Ships within 24 hours</span>
+                    </div>
+                    <div class="shipping-item">
+                        <span class="shipping-icon">↩️</span>
+                        <span>30-day money-back guarantee</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Attribution Analysis Section -->
+        <section class="attribution-section">
+            <h2>Attribution Analysis Dashboard</h2>
+            <div class="attribution-grid">
+                <div class="attribution-card">
+                    <h3>Current Session</h3>
+                    <div class="journey-info">
+                        <div class="journey-step">
+                            <span class="step-icon">🎯</span>
+                            <span id="currentSource">Direct Visit</span>
+                        </div>
+                        <div class="session-details">
+                            <span>Session ID: <code id="sessionId">-</code></span>
+                            <span>User ID: <code id="userId">-</code></span>
+                            <span>Tracking: <code id="trackingMode">-</code></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="attribution-card">
+                    <h3>Customer Journey Simulator</h3>
+                    <div class="journey-simulator">
+                        <button class="journey-btn" onclick="simulateJourney('ad_click')">
+                            📱 Ad Click → Purchase
+                        </button>
+                        <button class="journey-btn" onclick="simulateJourney('direct')">
+                            🔗 Direct Visit → Purchase
+                        </button>
+                        <button class="journey-btn" onclick="simulateJourney('ad_delayed')">
+                            📺 Ad View → Close → Return → Purchase
+                        </button>
+                        <button class="journey-btn" onclick="simulateJourney('search')">
+                            👀 Ad View → Google Search → Purchase
+                        </button>
+                        <button class="journey-btn" onclick="simulateJourney('history')">
+                            🔗 Ad Click → Close → Browser History → Purchase
+                        </button>
+                    </div>
+                </div>
+
+                <div class="attribution-card">
+                    <h3>Conversion Paths</h3>
+                    <div class="conversion-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="adClickConversions">0</span>
+                            <span class="stat-label">Ad Click Conversions</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="directConversions">0</span>
+                            <span class="stat-label">Direct Conversions</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="delayedConversions">0</span>
+                            <span class="stat-label">Delayed Conversions</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="searchConversions">0</span>
+                            <span class="stat-label">Search Conversions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Shopping Cart Modal -->
+        <div id="cartModal" class="modal">
+            <div class="modal-content cart-modal">
+                <span class="close-btn" onclick="closeCart()">&times;</span>
+                <h2>Shopping Cart</h2>
+                <div id="cartContents">
+                    <p class="empty-cart">Your cart is empty</p>
+                </div>
+                <div class="cart-total">
+                    <strong>Total: $<span id="cartTotal">0.00</span></strong>
+                </div>
+                <div class="cart-actions">
+                    <button id="continueShoppingBtn" class="btn-secondary" onclick="closeCart()">Continue Shopping</button>
+                    <button id="checkoutBtn" class="btn-primary">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Modal -->
+        <div id="checkoutModal" class="modal">
+            <div class="modal-content checkout-modal">
+                <span class="close-btn" onclick="closeCheckout()">&times;</span>
+                <h2>Checkout</h2>
+                <form id="checkoutForm">
+                    <div class="checkout-section">
+                        <h3>Order Summary</h3>
+                        <div id="orderSummary"></div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3>Customer Information</h3>
+                        <div class="demo-notice">
+                            <p><strong>📝 Demo Mode:</strong> All fields are optional for demonstration purposes. Click "Complete Purchase" to simulate checkout.</p>
+                        </div>
+                        <div class="form-row">
+                            <input type="text" placeholder="First Name (Optional)">
+                            <input type="text" placeholder="Last Name (Optional)">
+                        </div>
+                        <input type="email" placeholder="Email Address (Optional)">
+                        <input type="tel" placeholder="Phone Number (Optional)">
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3>Shipping Address</h3>
+                        <input type="text" placeholder="Street Address (Optional)">
+                        <div class="form-row">
+                            <input type="text" placeholder="City (Optional)">
+                            <input type="text" placeholder="State (Optional)">
+                            <input type="text" placeholder="ZIP Code (Optional)">
+                        </div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="demo" checked>
+                                <span>💳 Demo Payment (No real payment)</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="simulation">
+                                <span>🎭 Simulation Mode</span>
+                            </label>
+                        </div>
+                        <input type="text" placeholder="Card Number (Demo: 4111-1111-1111-1111)">
+                        <div class="form-row">
+                            <input type="text" placeholder="MM/YY (Demo: 12/25)">
+                            <input type="text" placeholder="CVV (Demo: 123)">
+                        </div>
+                    </div>
+
+                    <div class="checkout-total">
+                        <div class="total-line">
+                            <span>Subtotal:</span>
+                            <span>$<span id="checkoutSubtotal">0.00</span></span>
+                        </div>
+                        <div class="total-line">
+                            <span>Shipping:</span>
+                            <span id="shippingCost">FREE</span>
+                        </div>
+                        <div class="total-line total-final">
+                            <span>Total:</span>
+                            <span>$<span id="checkoutTotal">0.00</span></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large">Complete Purchase</button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Load tracking configuration -->
+    <script>
+        // Initialize data layer for GTM-style tracking
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function() { dataLayer.push(arguments); };
+        
+        // Set initial attribution source from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const attribution = urlParams.get('utm_source') || urlParams.get('ref') || 'direct';
+        window.attributionSource = attribution;
+    </script>
+    
+    <!-- Core tracking scripts -->
+    <script src="js/tracking-config.js"></script>
+    <script src="js/core-web-vitals.js"></script>
+    <script src="js/product.js"></script>
+    <script src="js/attribution.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

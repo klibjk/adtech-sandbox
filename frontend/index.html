@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdTech Analytics Sandbox</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h1>AdTech Analytics Sandbox</h1>
+            <div class="copyright">© 2025 David A. Povis</div>
+        </div>
+        
+        <div class="header-center">
+            <div class="analytics-navbar">
+                <h3>Live Analytics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Events</span>
+                        <span id="totalEvents" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Views</span>
+                        <span id="adViews" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Clicks</span>
+                        <span id="adClicks" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Mode</span>
+                        <span id="currentMode" class="metric-value">Cookie</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="controls">
+                <label class="toggle">
+                    <input type="checkbox" id="trackingMode" checked>
+                    <span class="toggle-slider"></span>
+                    <span id="trackingLabel">Cookie Tracking</span>
+                </label>
+                <button id="clearData" class="btn-secondary">Clear Data</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Banner Ad Unit -->
+        <section class="content-section">
+            <h2>Main Content</h2>
+            <div id="banner-ad" class="ad-unit banner-ad" data-ad-id="banner-001" data-ad-type="banner">
+                <div class="ad-content">
+                    <img src="ad-images/grumpy-cat.jpg" alt="Banner Advertisement" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+            <p>This is the main content area where banner ads are displayed above the fold.</p>
+        </section>
+
+        <!-- Sticky Ad Unit -->
+        <div id="sticky-ad" class="ad-unit sticky-ad" data-ad-id="sticky-001" data-ad-type="sticky">
+            <div class="ad-content">
+                <span class="close-btn" onclick="closeStickyAd()">&times;</span>
+                <img src="ad-images/jumping-cat.avif" alt="Sticky Advertisement" style="max-width: 320px; height: auto;">
+            </div>
+        </div>
+
+        <!-- Extended content to make page longer and scrolling more noticeable -->
+        <section class="content-section">
+            <h2>Understanding Modern AdTech Analytics</h2>
+            <p>The digital advertising landscape has evolved dramatically over the past decade. Modern ad technology requires sophisticated tracking mechanisms to understand user behavior, measure campaign effectiveness, and optimize performance across multiple touchpoints.</p>
+            <p>Cookie-based tracking has been the industry standard for years, providing reliable user identification and attribution. However, with increasing privacy regulations and browser restrictions, the industry is rapidly transitioning to cookieless alternatives.</p>
+            <p>This transition presents unique challenges for marketers and analysts who need to maintain measurement accuracy while respecting user privacy. Understanding both methodologies is crucial for modern advertising professionals.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Core Web Vitals and Ad Performance</h2>
+            <p>Performance monitoring has become increasingly important as search engines incorporate Core Web Vitals into ranking algorithms. The relationship between ad loading and page performance is complex and requires careful optimization.</p>
+            <p>Largest Contentful Paint (LCP) measures loading performance and can be significantly impacted by ad rendering. First Input Delay (FID) tracks interactivity, while Cumulative Layout Shift (CLS) measures visual stability - all critical for user experience.</p>
+            <p>Modern ad implementations must balance revenue generation with performance optimization. This requires sophisticated measurement and real-time optimization capabilities.</p>
+            <div class="highlight-box">
+                <h3>💡 Key Performance Metrics</h3>
+                <ul>
+                    <li><strong>LCP:</strong> Should occur within 2.5 seconds of page start</li>
+                    <li><strong>FID:</strong> Should be less than 100 milliseconds</li>
+                    <li><strong>CLS:</strong> Should be less than 0.1</li>
+                    <li><strong>Viewability:</strong> At least 50% visible for 1+ seconds</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Attribution Methodologies</h2>
+            <p>Attribution models determine how conversion credit is assigned across touchpoints. With the shift from cookie-based to cookieless tracking, attribution methodologies must evolve to maintain accuracy while respecting privacy constraints.</p>
+            <p>First-party data collection, server-side tracking, and probabilistic matching are becoming essential components of modern attribution strategies. Each approach has distinct advantages and limitations that analytics professionals must understand.</p>
+            <p>The transition period presents unique challenges as organizations must operate dual measurement systems, comparing results between cookie-based and cookieless methodologies to ensure data continuity.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Data Quality and Validation</h2>
+            <p>Robust data quality processes are essential for reliable analytics. This includes real-time validation, automated quality checks, and comprehensive testing frameworks that ensure data integrity across the entire pipeline.</p>
+            <p>Tag quality assurance involves testing tracking implementations across different browsers, devices, and user scenarios. Automated testing helps identify issues before they impact data collection.</p>
+            <p>Data validation schemas, like the tracking plan configuration used in this sandbox, provide structured approaches to ensure event data meets expected formats and business requirements.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Advanced Analytics Implementation</h2>
+            <p>Modern analytics implementations require careful consideration of data architecture, real-time processing capabilities, and scalable infrastructure. The choice between client-side and server-side tracking impacts both data quality and privacy compliance.</p>
+            <p>Event-driven architectures enable real-time analysis and optimization, while batch processing provides comprehensive historical analysis. Understanding when to use each approach is crucial for effective analytics implementation.</p>
+            <p>Database optimization, including proper indexing and aggregation strategies, ensures that analytics queries perform efficiently even with large datasets. This sandbox demonstrates these principles with PostgreSQL views and optimized schema design.</p>
+        </section>
+
+        <!-- Scroll indicator to show sticky ad trigger point -->
+        <section class="content-section scroll-indicator">
+            <h2>🎯 Sticky Ad Trigger Zone</h2>
+            <p><strong>Keep scrolling down...</strong> The sticky ad will appear when you scroll past this section (800px from top). This demonstrates realistic ad timing based on user engagement depth.</p>
+            <p>In production environments, sticky ad timing is often based on user engagement signals like scroll depth, time on page, or content consumption metrics rather than simple pixel thresholds.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Real-World Implementation Scenarios</h2>
+            <p>This sandbox demonstrates practical scenarios commonly encountered in enterprise environments. The dual tracking modes simulate real-world migration scenarios where organizations transition from cookie-based to cookieless tracking.</p>
+            <p>Performance monitoring integration shows how teams can correlate ad performance with site performance, enabling optimization decisions based on comprehensive data rather than isolated metrics.</p>
+            <p>The QA automation framework demonstrates industry best practices for ensuring tracking reliability across deployment cycles and code changes.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Interview Preparation Guide</h2>
+            <p>For Solutions Engineering roles, focus on the technical implementation details, debugging capabilities, and performance optimization aspects. Be prepared to discuss how different tracking approaches impact data quality and user experience.</p>
+            <p>For Marketing Technology Analytics roles, emphasize the data pipeline architecture, attribution methodologies, and business impact measurement. Understanding the relationship between technical implementation and business outcomes is crucial.</p>
+            <p>Practice explaining complex technical concepts in business terms, and be ready to demonstrate how this sandbox addresses real-world challenges in digital advertising and analytics.</p>
+        </section>
+
+        <!-- Trigger for interstitial ad -->
+        <section class="content-section">
+            <h2>Interactive Demo Controls</h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                <button id="triggerInterstitial" class="btn-primary">Show Interstitial Ad</button>
+                <a href="product.html" class="btn-secondary" style="display: inline-flex; align-items: center; text-decoration: none;">🛒 Visit Product Page</a>
+            </div>
+            <p>Click the button above to trigger an interstitial ad experience, or visit our demo product page to see ecommerce attribution tracking in action.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Technical Deep Dive</h2>
+            <p>The architecture of this sandbox follows industry best practices for scalable analytics infrastructure. The event pipeline demonstrates how to handle high-volume data ingestion while maintaining data quality and real-time processing capabilities.</p>
+            <p>Database schema design includes proper indexing strategies, partitioning considerations, and analytics-optimized views. This approach enables both operational queries and analytical workloads on the same infrastructure.</p>
+            <p>The API design follows RESTful principles with comprehensive error handling, request validation, and monitoring capabilities. This ensures reliable data collection even under adverse conditions.</p>
+        </section>
+    </main>
+
+    <!-- Interstitial Ad Modal -->
+    <div id="interstitial-modal" class="modal" data-ad-id="interstitial-001" data-ad-type="interstitial">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeInterstitial()">&times;</span>
+            <div class="ad-content">
+                <img src="ad-images/grumpy-cat.jpg" alt="Interstitial Advertisement" style="max-width: 100%; height: auto; max-height: 400px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>AdTech Analytics Sandbox - Demonstrating modern advertising technology and analytics pipelines</p>
+            <p>Built for Solutions Engineering and Marketing Tech Analytics interview preparation</p>
+        </div>
+    </footer>
+
+    <!-- Load tracking configuration -->
+    <script>
+        // Initialize data layer for GTM-style tracking
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function() { dataLayer.push(arguments); };
+        
+        // Fix image paths for cross-port compatibility
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.port !== '3000') {
+                const baseUrl = 'http://localhost:3000';
+                document.querySelectorAll('img[src^="ad-images/"]').forEach(img => {
+                    img.src = baseUrl + '/' + img.getAttribute('src');
+                });
+            }
+        });
+    </script>
+    
+    <!-- Core tracking scripts -->
+    <script src="js/tracking-config.js"></script>
+    <script src="js/core-web-vitals.js"></script>
+    <script src="js/ads/ad-manager.js"></script>
+    <script src="js/tracking.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

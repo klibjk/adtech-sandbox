@@ -1,0 +1,41 @@
+{
+  "name": "adtech-analytics-sandbox",
+  "version": "1.0.0",
+  "description": "AdTech analytics sandbox for interview demonstration",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:api\"",
+    "dev:frontend": "vite frontend",
+    "dev:api": "nodemon api/server.js",
+    "build": "vite build frontend",
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint . --fix && prettier --write .",
+    "test": "vitest",
+    "export-data": "node scripts/export-data.js",
+    "qa": "node tests/tag-qa.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "concurrently": "^8.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.0",
+    "nodemon": "^3.0.0",
+    "playwright": "^1.40.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "cors": "^2.8.5",
+    "pg": "^8.11.0",
+    "dotenv": "^16.3.0"
+  }
+}

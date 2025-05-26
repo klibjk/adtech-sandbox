@@ -1,0 +1,181 @@
+{
+  "version": "1.0.0",
+  "trackingPlan": {
+    "events": {
+      "ad_view": {
+        "description": "Fired when an ad becomes visible in viewport",
+        "parameters": {
+          "ad_id": { "type": "string", "required": true },
+          "ad_type": { "type": "string", "required": true, "enum": ["banner", "sticky", "interstitial"] },
+          "viewport_percentage": { "type": "number", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true },
+          "tracking_mode": { "type": "string", "required": true, "enum": ["cookie", "cookieless"] },
+          "page_url": { "type": "string", "required": true }
+        }
+      },
+      "ad_click": {
+        "description": "Fired when user clicks on an ad",
+        "parameters": {
+          "ad_id": { "type": "string", "required": true },
+          "ad_type": { "type": "string", "required": true, "enum": ["banner", "sticky", "interstitial"] },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true },
+          "tracking_mode": { "type": "string", "required": true, "enum": ["cookie", "cookieless"] },
+          "page_url": { "type": "string", "required": true },
+          "click_x": { "type": "number", "required": false },
+          "click_y": { "type": "number", "required": false }
+        }
+      },
+      "web_vitals": {
+        "description": "Core Web Vitals measurement",
+        "parameters": {
+          "metric_name": { "type": "string", "required": true, "enum": ["CLS", "LCP", "FID", "FCP", "TTFB"] },
+          "metric_value": { "type": "number", "required": true },
+          "metric_rating": { "type": "string", "required": true, "enum": ["good", "needs-improvement", "poor"] },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true },
+          "page_url": { "type": "string", "required": true }
+        }
+      },
+      "error": {
+        "description": "JavaScript error tracking",
+        "parameters": {
+          "error_message": { "type": "string", "required": true },
+          "error_stack": { "type": "string", "required": false },
+          "error_line": { "type": "number", "required": false },
+          "error_column": { "type": "number", "required": false },
+          "error_filename": { "type": "string", "required": false },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true },
+          "page_url": { "type": "string", "required": true }
+        }
+      },
+      "product_option_selected": {
+        "description": "User selects product option (size, quantity, etc.)",
+        "parameters": {
+          "option_type": { "type": "string", "required": true },
+          "option_value": { "type": "string", "required": true },
+          "price": { "type": "number", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true }
+        }
+      },
+      "add_to_cart": {
+        "description": "User adds item to shopping cart",
+        "parameters": {
+          "product_id": { "type": "string", "required": true },
+          "product_name": { "type": "string", "required": true },
+          "product_size": { "type": "string", "required": true },
+          "quantity": { "type": "number", "required": true },
+          "price": { "type": "number", "required": true },
+          "total_value": { "type": "number", "required": true },
+          "attribution_source": { "type": "string", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true }
+        }
+      },
+      "buy_now": {
+        "description": "User bypasses cart and purchases immediately",
+        "parameters": {
+          "product_id": { "type": "string", "required": true },
+          "product_name": { "type": "string", "required": true },
+          "product_size": { "type": "string", "required": true },
+          "quantity": { "type": "number", "required": true },
+          "price": { "type": "number", "required": true },
+          "total_value": { "type": "number", "required": true },
+          "attribution_source": { "type": "string", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true }
+        }
+      },
+      "begin_checkout": {
+        "description": "User begins checkout process",
+        "parameters": {
+          "cart_value": { "type": "number", "required": true },
+          "cart_items": { "type": "number", "required": true },
+          "attribution_source": { "type": "string", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true }
+        }
+      },
+      "purchase": {
+        "description": "User completes purchase transaction",
+        "parameters": {
+          "transaction_id": { "type": "string", "required": true },
+          "value": { "type": "number", "required": true },
+          "currency": { "type": "string", "required": true },
+          "cart_items": { "type": "number", "required": true },
+          "products": { "type": "array", "required": true },
+          "attribution_source": { "type": "string", "required": true },
+          "conversion_path": { "type": "object", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true }
+        }
+      },
+      "journey_simulation_start": {
+        "description": "Attribution journey simulation begins",
+        "parameters": {
+          "journey_type": { "type": "string", "required": true },
+          "journey_name": { "type": "string", "required": true },
+          "expected_steps": { "type": "number", "required": true },
+          "simulated_delay": { "type": "number", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true }
+        }
+      },
+      "journey_step": {
+        "description": "Step in attribution journey simulation",
+        "parameters": {
+          "journey_type": { "type": "string", "required": true },
+          "step_name": { "type": "string", "required": true },
+          "step_number": { "type": "number", "required": true },
+          "total_steps": { "type": "number", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true }
+        }
+      },
+      "attribution_page_view": {
+        "description": "Page view with attribution tracking",
+        "parameters": {
+          "page_type": { "type": "string", "required": true },
+          "attribution_source": { "type": "string", "required": true },
+          "is_simulation": { "type": "boolean", "required": true },
+          "session_start": { "type": "number", "required": true },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true }
+        }
+      }
+    },
+    "dimensions": {
+      "session_id": {
+        "description": "Unique session identifier",
+        "generation": "uuid_v4"
+      },
+      "user_id": {
+        "description": "User identifier (cookie-based or fingerprint)",
+        "generation": "adaptive"
+      },
+      "tracking_mode": {
+        "description": "Current tracking method",
+        "values": ["cookie", "cookieless"]
+      }
+    },
+    "endpoints": {
+      "events": "/api/events",
+      "health": "/api/health"
+    }
+  }
+}

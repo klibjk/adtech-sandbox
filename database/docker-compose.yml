@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: adtech_postgres
+    environment:
+      POSTGRES_DB: adtech_sandbox
+      POSTGRES_USER: adtech_user
+      POSTGRES_PASSWORD: adtech_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./seeds.sql:/docker-entrypoint-initdb.d/02-seeds.sql
+      - ./views:/docker-entrypoint-initdb.d/views
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adtech_user -d adtech_sandbox"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

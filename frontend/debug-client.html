@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client-Side Debug</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f0f0f0; }
+        .test { margin: 10px 0; padding: 10px; background: white; border-radius: 4px; }
+        .success { border-left: 4px solid #4caf50; }
+        .error { border-left: 4px solid #f44336; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f8f8; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Client-Side API Debug</h1>
+    
+    <div class="test">
+        <h3>Current URL Info</h3>
+        <pre id="urlInfo"></pre>
+    </div>
+
+    <div class="test">
+        <h3>API Endpoint Tests</h3>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <button onclick="testEvents()">Test Events Endpoint</button>
+        <button onclick="testDirectAPI()">Test Direct API (Port 3000)</button>
+        <div id="apiResults"></div>
+    </div>
+
+    <div class="test">
+        <h3>Tracking Config Test</h3>
+        <button onclick="loadTrackingConfig()">Load Tracking Config</button>
+        <button onclick="testEventSending()">Test Event Sending</button>
+        <div id="trackingResults"></div>
+    </div>
+
+    <script>
+        // Display URL information
+        document.getElementById('urlInfo').textContent = `
+Protocol: ${window.location.protocol}
+Host: ${window.location.host}
+Port: ${window.location.port}
+Pathname: ${window.location.pathname}
+Full URL: ${window.location.href}
+        `;
+
+        function addResult(containerId, message, isError = false) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = isError ? 'error' : 'success';
+            div.innerHTML = `<pre>${message}</pre>`;
+            container.appendChild(div);
+        }
+
+        async function testHealth() {
+            try {
+                console.log('🏥 Testing health endpoint...');
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                addResult('apiResults', `✅ Health Check: ${response.status}\n${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                addResult('apiResults', `❌ Health Check Failed: ${error.message}`, true);
+                console.error('Health check error:', error);
+            }
+        }
+
+        async function testEvents() {
+            try {
+                console.log('📤 Testing events endpoint...');
+                const testEvent = {
+                    event_type: 'client_debug_test',
+                    session_id: 'sess_debug_' + Date.now(),
+                    user_id: 'user_debug_' + Date.now(),
+                    tracking_mode: 'cookie',
+                    timestamp: Date.now(),
+                    page_url: window.location.href
+                };
+
+                const response = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testEvent)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('apiResults', `✅ Events POST: ${response.status}\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    const errorData = await response.json();
+                    addResult('apiResults', `❌ Events POST Failed: ${response.status}\n${JSON.stringify(errorData, null, 2)}`, true);
+                }
+            } catch (error) {
+                addResult('apiResults', `❌ Events POST Error: ${error.message}`, true);
+                console.error('Events POST error:', error);
+            }
+        }
+
+        async function testDirectAPI() {
+            try {
+                console.log('🎯 Testing direct API (port 3000)...');
+                const response = await fetch('http://localhost:3000/api/health');
+                const data = await response.json();
+                addResult('apiResults', `✅ Direct API: ${response.status}\n${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                addResult('apiResults', `❌ Direct API Failed: ${error.message}`, true);
+                console.error('Direct API error:', error);
+            }
+        }
+
+        async function loadTrackingConfig() {
+            try {
+                console.log('🔧 Loading tracking config...');
+                
+                // Load the tracking config script
+                const script = document.createElement('script');
+                script.src = '/js/tracking-config.js';
+                script.onload = () => {
+                    addResult('trackingResults', '✅ Tracking config loaded successfully');
+                    
+                    // Initialize tracking
+                    setTimeout(() => {
+                        if (window.trackingConfig) {
+                            addResult('trackingResults', `✅ TrackingConfig initialized:\nSession: ${window.trackingConfig.sessionId}\nUser: ${window.trackingConfig.userId}\nMode: ${window.trackingConfig.trackingMode}`);
+                        } else {
+                            addResult('trackingResults', '❌ TrackingConfig not available', true);
+                        }
+                    }, 1000);
+                };
+                script.onerror = () => {
+                    addResult('trackingResults', '❌ Failed to load tracking config script', true);
+                };
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                addResult('trackingResults', `❌ Tracking config error: ${error.message}`, true);
+                console.error('Tracking config error:', error);
+            }
+        }
+
+        async function testEventSending() {
+            try {
+                console.log('📡 Testing event sending...');
+                
+                if (!window.trackingConfig) {
+                    addResult('trackingResults', '❌ TrackingConfig not loaded. Click "Load Tracking Config" first.', true);
+                    return;
+                }
+
+                const result = await window.trackingConfig.sendEvent('debug_test', {
+                    test_parameter: 'client_debug_value',
+                    debug_timestamp: Date.now()
+                });
+
+                addResult('trackingResults', `✅ Event sent successfully:\n${JSON.stringify(result, null, 2)}`);
+                
+            } catch (error) {
+                addResult('trackingResults', `❌ Event sending failed: ${error.message}`, true);
+                console.error('Event sending error:', error);
+            }
+        }
+
+        // Initialize dataLayer
+        window.dataLayer = window.dataLayer || [];
+        
+        console.log('🚀 Client debug page loaded');
+        console.log('Current location:', window.location.href);
+    </script>
+</body>
+</html>
