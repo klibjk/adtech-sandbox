@@ -4,6 +4,8 @@ class AdManager {
         this.observers = {};
         this.viewedAds = new Set();
         this.clickedAds = new Set();
+        this.viewCount = 0;
+        this.clickCount = 0;
         this.adElements = [];
         this.stickyAdVisible = false;
         this.adImageIndex = 0;
@@ -45,7 +47,10 @@ class AdManager {
 
     findAdElements() {
         this.adElements = Array.from(document.querySelectorAll('.ad-unit'));
-        console.log(`Found ${this.adElements.length} ad units`);
+        console.log(`🔍 Found ${this.adElements.length} ad units:`);
+        this.adElements.forEach((ad, index) => {
+            console.log(`🔍 Ad ${index}: ID=${ad.id}, data-ad-id=${ad.dataset.adId}, data-ad-type=${ad.dataset.adType}`);
+        });
     }
 
     setupIntersectionObserver() {
@@ -77,8 +82,9 @@ class AdManager {
         const adId = adElement.dataset.adId;
         const adType = adElement.dataset.adType;
         
-        // Mark as viewed
+        // Mark as viewed and increment view counter
         this.viewedAds.add(adId);
+        this.viewCount++;
         adElement.classList.add('viewed');
         
         // Send tracking event
@@ -95,9 +101,18 @@ class AdManager {
     }
 
     setupClickTracking() {
-        this.adElements.forEach(ad => {
+        console.log(`🎯 Setting up click tracking for ${this.adElements.length} ads`);
+        this.adElements.forEach((ad, index) => {
+            console.log(`🎯 Adding click listener to ad ${index}: ${ad.id}`);
             ad.addEventListener('click', (event) => {
-                this.handleAdClick(ad, event);
+                console.log(`🎯 Click event fired on ad: ${ad.id}, target: ${event.target.tagName}`);
+                // Skip click tracking if user clicked the close button
+                if (!event.target.classList.contains('close-btn')) {
+                    console.log(`🎯 Processing click (not close button)`);
+                    this.handleAdClick(ad, event);
+                } else {
+                    console.log(`🎯 Skipping click (close button)`);
+                }
             });
         });
     }
@@ -106,9 +121,25 @@ class AdManager {
         const adId = adElement.dataset.adId;
         const adType = adElement.dataset.adType;
         
-        // Mark as clicked
+        console.log(`🔥 Ad click handler triggered - ID: ${adId}, Type: ${adType}`);
+        console.log(`🔥 Clicked ads before adding:`, Array.from(this.clickedAds));
+        
+        // Check if this is the cat box ad and prevent default early
+        const imgElement = adElement.querySelector('img');
+        if (imgElement && imgElement.src.includes('cat-cardboard-box.jpg')) {
+            console.log(`🔥 Cat box ad detected, preventing default`);
+            // Prevent default to handle redirect ourselves
+            event.preventDefault();
+        }
+        
+        // Mark as clicked and increment click counter
         this.clickedAds.add(adId);
+        this.clickCount++;
         adElement.classList.add('clicked');
+        
+        console.log(`🔥 Clicked ads after adding:`, Array.from(this.clickedAds));
+        console.log(`🔥 Total clicked ads count:`, this.clickedAds.size);
+        console.log(`🔥 Total click counter:`, this.clickCount);
         
         // Send tracking event
         this.sendAdEvent('ad_click', {
@@ -126,12 +157,9 @@ class AdManager {
 
         console.log(`Ad clicked: ${adId} (${adType})`);
 
-        // Check if this is the cat box ad and redirect to product page
-        const imgElement = adElement.querySelector('img');
+        // Handle cat box ad redirect to product page
         if (imgElement && imgElement.src.includes('cat-cardboard-box.jpg')) {
-            // Prevent default to handle redirect ourselves
-            event.preventDefault();
-            
+            console.log(`🔥 Opening product page for cat box ad`);
             // Add delay for visual feedback, then open in new tab
             setTimeout(() => {
                 const productUrl = `product.html?utm_source=ad_click&utm_medium=${adType}&utm_campaign=cat_box&ad_id=${adId}`;
@@ -188,6 +216,9 @@ class AdManager {
             imgElement.onload = () => {
                 imgElement.style.opacity = '1';
                 console.log(`✅ Successfully loaded ad image: ${newImage}`);
+                
+                // Trigger a new view event for the image change
+                this.handleAdView(adElement, 1.0); // 100% visible since it's already on screen
             };
             
             // Handle load errors
@@ -227,13 +258,6 @@ class AdManager {
                 
                 // Add to intersection observer
                 this.observers.visibility.observe(stickyAd);
-                
-                // Add click tracking
-                stickyAd.addEventListener('click', (event) => {
-                    if (!event.target.classList.contains('close-btn')) {
-                        this.handleAdClick(stickyAd, event);
-                    }
-                });
 
                 console.log('🎯 Sticky ad triggered at scroll position:', window.scrollY);
                 
@@ -395,11 +419,25 @@ class AdManager {
         const adViewsEl = document.getElementById('adViews');
         const adClicksEl = document.getElementById('adClicks');
         
-        const totalEvents = this.viewedAds.size + this.clickedAds.size;
+        const totalEvents = this.viewCount + this.clickCount;
         
-        if (totalEventsEl) totalEventsEl.textContent = totalEvents;
-        if (adViewsEl) adViewsEl.textContent = this.viewedAds.size;
-        if (adClicksEl) adClicksEl.textContent = this.clickedAds.size;
+        console.log(`📊 Updating metrics display:`);
+        console.log(`📊 View count: ${this.viewCount}, Click count: ${this.clickCount}`);
+        console.log(`📊 Total events: ${totalEvents}`);
+        console.log(`📊 Elements found - totalEvents: ${!!totalEventsEl}, adViews: ${!!adViewsEl}, adClicks: ${!!adClicksEl}`);
+        
+        if (totalEventsEl) {
+            totalEventsEl.textContent = totalEvents;
+            console.log(`📊 Updated totalEvents to: ${totalEvents}`);
+        }
+        if (adViewsEl) {
+            adViewsEl.textContent = this.viewCount;
+            console.log(`📊 Updated adViews to: ${this.viewCount}`);
+        }
+        if (adClicksEl) {
+            adClicksEl.textContent = this.clickCount;
+            console.log(`📊 Updated adClicks to: ${this.clickCount}`);
+        }
     }
 
     // Public methods for external control
@@ -414,6 +452,8 @@ class AdManager {
     resetMetrics() {
         this.viewedAds.clear();
         this.clickedAds.clear();
+        this.viewCount = 0;
+        this.clickCount = 0;
         this.updateMetricsDisplay();
         
         // Remove visual indicators
