@@ -132,10 +132,10 @@ class AdManager {
             // Prevent default to handle redirect ourselves
             event.preventDefault();
             
-            // Add delay for visual feedback, then redirect
+            // Add delay for visual feedback, then open in new tab
             setTimeout(() => {
                 const productUrl = `product.html?utm_source=ad_click&utm_medium=${adType}&utm_campaign=cat_box&ad_id=${adId}`;
-                window.location.href = productUrl;
+                window.open(productUrl, '_blank');
             }, 500);
         }
     }
