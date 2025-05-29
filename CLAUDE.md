@@ -59,3 +59,6 @@ Deprecate obsolete rules rather than leaving stale instructions.
 Explore → Plan → Code → Commit: Prompt yourself for goals, outline a plan, generate code, then commit.
 
 Keep commit messages concise and semantic; reference related BUILD_LOG line numbers.
+
+## Commit Message Guidelines
+NEVER reference Claude, AI, or automated authoring in commit messages. Write commit messages as if authored by a human developer. Focus on the technical changes and business value delivered.

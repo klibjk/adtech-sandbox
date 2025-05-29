@@ -5,9 +5,17 @@ class TrackingConfig {
         this.apiEndpoint = window.location.port === '3000' 
             ? '/api/events' 
             : 'http://localhost:3000/api/events';
+        this.healthEndpoint = window.location.port === '3000' 
+            ? '/api/health' 
+            : 'http://localhost:3000/api/health';
         this.sessionId = this.generateSessionId();
         this.userId = null;
         this.trackingMode = 'cookie'; // 'cookie' or 'cookieless'
+        this.apiHealthy = true;
+        this.lastHealthCheck = 0;
+        this.healthCheckInterval = 30000; // 30 seconds
+        this.failureCount = 0;
+        this.maxFailures = 3;
         this.init();
     }
 
@@ -113,6 +121,42 @@ class TrackingConfig {
         console.log('All tracking data cleared');
     }
 
+    async checkApiHealth() {
+        const now = Date.now();
+        if (now - this.lastHealthCheck < this.healthCheckInterval) {
+            return this.apiHealthy;
+        }
+
+        try {
+            const response = await fetch(this.healthEndpoint, {
+                method: 'GET',
+                timeout: 5000
+            });
+            
+            if (response.ok) {
+                this.apiHealthy = true;
+                this.failureCount = 0;
+                this.lastHealthCheck = now;
+                return true;
+            } else {
+                this.failureCount++;
+                if (this.failureCount >= this.maxFailures) {
+                    this.apiHealthy = false;
+                }
+                this.lastHealthCheck = now;
+                return false;
+            }
+        } catch (error) {
+            this.failureCount++;
+            if (this.failureCount >= this.maxFailures) {
+                this.apiHealthy = false;
+            }
+            this.lastHealthCheck = now;
+            console.warn('API health check failed:', error);
+            return false;
+        }
+    }
+
     async sendEvent(eventType, eventData) {
         const payload = {
             event_type: eventType,
@@ -125,12 +169,21 @@ class TrackingConfig {
             ...eventData
         };
 
-
         // Add to dataLayer for GTM-style tracking
         window.dataLayer.push({
             event: eventType,
             ...payload
         });
+
+        // Check API health before sending if circuit breaker is open
+        if (!this.apiHealthy) {
+            const healthCheck = await this.checkApiHealth();
+            if (!healthCheck) {
+                console.warn('API is unhealthy, storing event for later retry');
+                this.storeFailedEvent(eventType, eventData);
+                return null;
+            }
+        }
 
         try {
             const response = await fetch(this.apiEndpoint, {
@@ -142,29 +195,41 @@ class TrackingConfig {
             });
 
             if (!response.ok) {
+                this.failureCount++;
+                if (this.failureCount >= this.maxFailures) {
+                    this.apiHealthy = false;
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
+            // Reset failure count on success
+            this.failureCount = 0;
+            this.apiHealthy = true;
+            
             console.log(`Event sent: ${eventType}`, payload);
             return payload;
         } catch (error) {
             console.error('Failed to send event:', error);
+            this.storeFailedEvent(eventType, eventData);
             
-            // Store failed events in localStorage for retry (limit to prevent quota issues)
-            try {
-                const failedEvents = JSON.parse(localStorage.getItem('failed_events') || '[]');
-                // Keep only last 10 failed events to prevent quota issues
-                if (failedEvents.length >= 10) {
-                    failedEvents.splice(0, failedEvents.length - 9);
-                }
-                failedEvents.push({ eventType, eventData, timestamp: Date.now() });
-                localStorage.setItem('failed_events', JSON.stringify(failedEvents));
-            } catch (quotaError) {
-                console.warn('localStorage quota exceeded, clearing failed events');
-                localStorage.removeItem('failed_events');
+            // IMPORTANT: Don't send error events for failed event sends to prevent recursion
+            // Only log to console instead of creating new tracking events
+            return null;
+        }
+    }
+
+    storeFailedEvent(eventType, eventData) {
+        try {
+            const failedEvents = JSON.parse(localStorage.getItem('failed_events') || '[]');
+            // Keep only last 10 failed events to prevent quota issues
+            if (failedEvents.length >= 10) {
+                failedEvents.splice(0, failedEvents.length - 9);
             }
-            
-            throw error;
+            failedEvents.push({ eventType, eventData, timestamp: Date.now() });
+            localStorage.setItem('failed_events', JSON.stringify(failedEvents));
+        } catch (quotaError) {
+            console.warn('localStorage quota exceeded, clearing failed events');
+            localStorage.removeItem('failed_events');
         }
     }
 

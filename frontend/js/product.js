@@ -476,14 +476,14 @@ class ProductManager {
         const currentSourceEl = document.getElementById('currentSource');
         
         const sourceNames = {
-            'ad_click': '📱 Ad Click',
-            'direct': '🔗 Direct Visit', 
-            'ad_delayed': '📺 Ad View → Return',
-            'search': '🔍 Google Search',
-            'history': '📖 Browser History'
+            'ad_click': 'Ad Click',
+            'direct': 'Direct Visit', 
+            'ad_delayed': 'Ad View → Return',
+            'search': 'Google Search',
+            'history': 'Browser History'
         };
         
-        const displayName = sourceNames[source] || '🔗 Direct Visit';
+        const displayName = sourceNames[source] || 'Direct Visit';
         
         if (attributionEl) attributionEl.textContent = displayName;
         if (currentSourceEl) currentSourceEl.textContent = displayName;
