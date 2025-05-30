@@ -41,6 +41,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <span id="adClicks" class="metric-value">0</span>
                     </div>
                     <div class="metric-card">
+                        <span class="metric-label">Closes</span>
+                        <span id="adCloses" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-card">
                         <span class="metric-label">Mode</span>
                         <span id="currentMode" class="metric-value">Cookie</span>
                     </div>
@@ -69,7 +73,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Banner Ad Unit -->
         <section class="content-section">
             <h2>Main Content</h2>
-            <div id="banner-ad" class="ad-unit banner-ad" data-ad-id="banner-001" data-ad-type="banner">
+            <div id="banner-ad" class="ad-unit banner-ad" data-ad-id="banner-001" data-ad-type="banner" data-ad-name="grumpy-cat.jpg">
                 <div class="ad-content">
                     <img src="ad-images/grumpy-cat.jpg" alt="Banner Advertisement" style="max-width: 100%; height: auto;">
                 </div>
@@ -78,10 +82,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <!-- Sticky Ad Unit -->
-        <div id="sticky-ad" class="ad-unit sticky-ad" data-ad-id="sticky-001" data-ad-type="sticky">
+        <div id="sticky-ad" class="ad-unit sticky-ad" data-ad-id="sticky-001" data-ad-type="sticky" data-ad-name="jumping-cat.avif">
             <div class="ad-content">
                 <span class="close-btn" onclick="closeStickyAd()">&times;</span>
                 <img src="ad-images/jumping-cat.avif" alt="Sticky Advertisement" style="max-width: 320px; height: auto;">
+            </div>
+        </div>
+
+        <!-- Cat Box Interest Ad (triggered by video click) -->
+        <div id="cat-box-interest-ad" class="ad-unit sticky-ad" data-ad-id="cat-box-interest-001" data-ad-type="sticky" data-ad-name="cat-cardboard-box.jpg">
+            <div class="ad-content">
+                <span class="close-btn" onclick="closeCatBoxAd()">&times;</span>
+                <img src="ad-images/cat-cardboard-box.jpg" alt="Cat Box Advertisement" style="max-width: 320px; height: auto;">
             </div>
         </div>
 
@@ -96,6 +108,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <section class="content-section">
             <h2>Core Web Vitals and Ad Performance</h2>
             <p>Performance monitoring has become increasingly important as search engines incorporate Core Web Vitals into ranking algorithms. The relationship between ad loading and page performance is complex and requires careful optimization.</p>
+            
+            <!-- Video Content Area -->
+            <div class="video-content-wrapper">
+                <h3>How to Spoil Your Cat on a Budget</h3>
+                <div class="video-player" data-video-id="spoil-cat-video" onclick="handleVideoClick(this)">
+                    <img src="http://localhost:3000/body-content-images/affordable-ways-you-can-spoil-your-cat.webp" alt="How to spoil your cat affordably" class="video-thumbnail">
+                    <div class="video-overlay">
+                        <div class="play-button">
+                            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                                <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.7)"/>
+                                <polygon points="22,18 22,42 42,30" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="video-duration">5:42</div>
+                    </div>
+                </div>
+                <p class="video-description">Learn practical and affordable ways to show your feline friend you care without breaking the bank.</p>
+            </div>
+            
             <p>Largest Contentful Paint (LCP) measures loading performance and can be significantly impacted by ad rendering. First Input Delay (FID) tracks interactivity, while Cumulative Layout Shift (CLS) measures visual stability - all critical for user experience.</p>
             <p>Modern ad implementations must balance revenue generation with performance optimization. This requires sophisticated measurement and real-time optimization capabilities.</p>
             <div class="highlight-box">
@@ -170,7 +201,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </main>
 
     <!-- Interstitial Ad Modal -->
-    <div id="interstitial-modal" class="modal" data-ad-id="interstitial-001" data-ad-type="interstitial">
+    <div id="interstitial-modal" class="modal" data-ad-id="interstitial-001" data-ad-type="interstitial" data-ad-name="grumpy-cat.jpg">
         <div class="modal-content">
             <span class="close-btn" onclick="closeInterstitial()">&times;</span>
             <div class="ad-content">

@@ -4,17 +4,24 @@ class AdManager {
         this.observers = {};
         this.viewedAds = new Set();
         this.clickedAds = new Set();
+        this.closedAds = new Set();
         this.viewCount = 0;
         this.clickCount = 0;
+        this.closeCount = 0;
         this.adElements = [];
         this.stickyAdVisible = false;
+        this.catBoxAdVisible = false;
         this.adImageIndex = 0;
+        this.adViewTimestamps = {}; // Track when each ad was first viewed
+        this.stickyAdCloseCount = 0; // Track closes in current session
+        this.maxStickyAdCloses = 3; // Limit for sticky ad closes
+        this.stickyAdsBlocked = false; // Flag to stop showing new sticky ads
         // Use full URLs when not on Express server port
         const baseUrl = window.location.port === '3000' ? '' : 'http://localhost:3000';
         this.adImages = [
             `${baseUrl}/ad-images/grumpy-cat.jpg`,
             `${baseUrl}/ad-images/jumping-cat.avif`,
-            `${baseUrl}/ad-images/cat-cardboard-box.jpg`
+            `${baseUrl}/ad-images/cat-meetup-ad.png`
         ];
         this.init();
     }
@@ -47,9 +54,9 @@ class AdManager {
 
     findAdElements() {
         this.adElements = Array.from(document.querySelectorAll('.ad-unit'));
-        console.log(`🔍 Found ${this.adElements.length} ad units:`);
+        console.log(`Found ${this.adElements.length} ad units:`);
         this.adElements.forEach((ad, index) => {
-            console.log(`🔍 Ad ${index}: ID=${ad.id}, data-ad-id=${ad.dataset.adId}, data-ad-type=${ad.dataset.adType}`);
+            console.log(`Ad ${index}: ID=${ad.id}, data-ad-id=${ad.dataset.adId}, data-ad-type=${ad.dataset.adType}`);
         });
     }
 
@@ -81,18 +88,30 @@ class AdManager {
     handleAdView(adElement, viewportPercentage) {
         const adId = adElement.dataset.adId;
         const adType = adElement.dataset.adType;
+        const adName = adElement.dataset.adName;
+        
+        // Only process if not already viewed (avoid duplicate views for same ad instance)
+        if (this.viewedAds.has(adId)) {
+            return;
+        }
         
         // Mark as viewed and increment view counter
         this.viewedAds.add(adId);
         this.viewCount++;
         adElement.classList.add('viewed');
         
+        // Record view timestamp for time-to-close calculation
+        this.adViewTimestamps[adId] = Date.now();
+        
         // Send tracking event
-        this.sendAdEvent('ad_view', {
+        const eventData = {
             ad_id: adId,
             ad_type: adType,
             viewport_percentage: Math.round(viewportPercentage * 100)
-        });
+        };
+        if (adName) eventData.ad_name = adName;
+        
+        this.sendAdEvent('ad_view', eventData);
 
         // Update UI counter
         this.updateMetricsDisplay();
@@ -101,17 +120,34 @@ class AdManager {
     }
 
     setupClickTracking() {
-        console.log(`🎯 Setting up click tracking for ${this.adElements.length} ads`);
+        console.log(`Setting up click tracking for ${this.adElements.length} ads`);
         this.adElements.forEach((ad, index) => {
-            console.log(`🎯 Adding click listener to ad ${index}: ${ad.id}`);
+            console.log(`Adding click listener to ad ${index}: ${ad.id}`);
             ad.addEventListener('click', (event) => {
-                console.log(`🎯 Click event fired on ad: ${ad.id}, target: ${event.target.tagName}`);
-                // Skip click tracking if user clicked the close button
-                if (!event.target.classList.contains('close-btn')) {
-                    console.log(`🎯 Processing click (not close button)`);
-                    this.handleAdClick(ad, event);
+                console.log(`Click event fired on ad: ${ad.id}, target: ${event.target.tagName}`);
+                // Handle close button clicks
+                if (event.target.classList.contains('close-btn')) {
+                    console.log(`Close button clicked`);
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.handleAdClose(ad);
+                    
+                    // Hide the ad (always allow user to close)
+                    if (ad.id === 'sticky-ad') {
+                        ad.classList.remove('visible');
+                        this.stickyAdVisible = false;
+                    } else if (ad.id === 'cat-box-interest-ad') {
+                        ad.classList.remove('visible');
+                        this.catBoxAdVisible = false;
+                    } else if (ad.id === 'interstitial-modal') {
+                        this.closeInterstitial();
+                    } else {
+                        // Generic ad hiding
+                        ad.style.display = 'none';
+                    }
                 } else {
-                    console.log(`🎯 Skipping click (close button)`);
+                    console.log(`Processing ad click (not close button)`);
+                    this.handleAdClick(ad, event);
                 }
             });
         });
@@ -120,6 +156,7 @@ class AdManager {
     handleAdClick(adElement, event) {
         const adId = adElement.dataset.adId;
         const adType = adElement.dataset.adType;
+        const adName = adElement.dataset.adName;
         
         console.log(`🔥 Ad click handler triggered - ID: ${adId}, Type: ${adType}`);
         console.log(`🔥 Clicked ads before adding:`, Array.from(this.clickedAds));
@@ -142,12 +179,15 @@ class AdManager {
         console.log(`🔥 Total click counter:`, this.clickCount);
         
         // Send tracking event
-        this.sendAdEvent('ad_click', {
+        const eventData = {
             ad_id: adId,
             ad_type: adType,
             click_x: event.clientX,
             click_y: event.clientY
-        });
+        };
+        if (adName) eventData.ad_name = adName;
+        
+        this.sendAdEvent('ad_click', eventData);
 
         // Update UI counter
         this.updateMetricsDisplay();
@@ -209,6 +249,15 @@ class AdManager {
         if (imgElement) {
             const newImage = this.getNextAdImage();
             
+            // Extract filename from image path for ad_name
+            const imageName = newImage.split('/').pop();
+            adElement.dataset.adName = imageName;
+            
+            // Create unique ad ID for each image rotation to allow tracking closes
+            const baseId = adElement.id.replace('-ad', '');
+            const uniqueId = `${baseId}-${this.adImageIndex}-${Date.now()}`;
+            adElement.dataset.adId = uniqueId;
+            
             // Add loading state
             imgElement.style.opacity = '0.5';
             
@@ -233,7 +282,7 @@ class AdManager {
             imgElement.src = newImage;
             imgElement.alt = `Advertisement ${this.adImageIndex}`;
             
-            console.log(`🔄 Attempting to load ad image: ${newImage}`);
+            console.log(`Attempting to load ad image: ${newImage} with ad_name: ${imageName}`);
         }
     }
 
@@ -244,22 +293,27 @@ class AdManager {
         // Create scroll progress indicator
         this.createScrollProgressIndicator();
 
-        // Show sticky ad after user scrolls down more (increased from 200px to 800px)
+        // Show sticky ad after user scrolls down (800px)
         const showStickyAd = () => {
             const scrollProgress = (window.scrollY / 800) * 100;
             this.updateScrollProgress(Math.min(scrollProgress, 100));
+
+            // Don't show new sticky ads if user has closed 3 already
+            if (this.stickyAdsBlocked) {
+                return;
+            }
 
             if (window.scrollY > 800 && !this.stickyAdVisible) {
                 stickyAd.classList.add('visible');
                 this.stickyAdVisible = true;
                 
-                // Update ad image with rotation
+                // Update ad image with rotation (now includes cat meetup)
                 this.updateAdImage(stickyAd);
                 
                 // Add to intersection observer
                 this.observers.visibility.observe(stickyAd);
 
-                console.log('🎯 Sticky ad triggered at scroll position:', window.scrollY);
+                console.log('Sticky ad triggered at scroll position:', window.scrollY);
                 
                 // Hide progress indicator once ad is shown
                 this.hideScrollProgress();
@@ -387,7 +441,7 @@ class AdManager {
         // Add to intersection observer to track view
         this.observers.visibility.observe(modal);
         
-        console.log('🎯 Interstitial ad triggered with image rotation');
+        console.log('Interstitial ad triggered with image rotation');
         
         // Auto-hide after 5 seconds (optional)
         setTimeout(() => {
@@ -405,6 +459,71 @@ class AdManager {
         }
     }
 
+    handleAdClose(adElement) {
+        const adId = adElement.dataset.adId;
+        const adType = adElement.dataset.adType;
+        const adName = adElement.dataset.adName;
+        
+        if (!adId || this.closedAds.has(adId)) {
+            console.log(`Ad close skipped - no ID or already closed: ${adId}`);
+            return;
+        }
+        
+        // Track sticky ad closes for session limit (only affects future ad displays)
+        if (adType === 'sticky' && adId !== 'cat-box-interest-001') {
+            this.stickyAdCloseCount++;
+            console.log(`Sticky ad close count: ${this.stickyAdCloseCount}/${this.maxStickyAdCloses}`);
+            
+            if (this.stickyAdCloseCount >= this.maxStickyAdCloses) {
+                this.stickyAdsBlocked = true;
+                console.log('Sticky ads blocked - no new sticky ads will appear this session');
+            }
+        }
+        
+        // Mark as closed and increment close counter
+        this.closedAds.add(adId);
+        this.closeCount++;
+        adElement.classList.add('closed');
+        
+        // Calculate time-to-close
+        const viewTimestamp = this.adViewTimestamps[adId];
+        const closeTimestamp = Date.now();
+        const timeToCloseMs = viewTimestamp ? closeTimestamp - viewTimestamp : null;
+        
+        // Send tracking event
+        const eventData = {
+            ad_id: adId,
+            ad_type: adType,
+            ad_view_timestamp: viewTimestamp || closeTimestamp,
+            time_to_close_ms: timeToCloseMs
+        };
+        if (adName) eventData.ad_name = adName;
+        
+        this.sendAdEvent('ad_close', eventData);
+
+        // Update UI counter
+        this.updateMetricsDisplay();
+
+        console.log(`Ad closed: ${adId} (${adType}) - Time to close: ${timeToCloseMs}ms`);
+    }
+
+    showCatBoxInterestAd() {
+        const catBoxAd = document.getElementById('cat-box-interest-ad');
+        if (!catBoxAd) {
+            console.error('Cat box interest ad element not found');
+            return;
+        }
+        
+        // Always show cat box ad when user shows interest, regardless of close limit
+        catBoxAd.classList.add('visible');
+        this.catBoxAdVisible = true;
+        
+        // Add to intersection observer to track view
+        this.observers.visibility.observe(catBoxAd);
+        
+        console.log('Cat box interest ad shown due to video click');
+    }
+
     sendAdEvent(eventType, eventData) {
         if (window.trackingConfig) {
             return window.trackingConfig.sendEvent(eventType, eventData);
@@ -418,13 +537,14 @@ class AdManager {
         const totalEventsEl = document.getElementById('totalEvents');
         const adViewsEl = document.getElementById('adViews');
         const adClicksEl = document.getElementById('adClicks');
+        const adClosesEl = document.getElementById('adCloses');
         
-        const totalEvents = this.viewCount + this.clickCount;
+        const totalEvents = this.viewCount + this.clickCount + this.closeCount;
         
         console.log(`📊 Updating metrics display:`);
-        console.log(`📊 View count: ${this.viewCount}, Click count: ${this.clickCount}`);
+        console.log(`📊 View count: ${this.viewCount}, Click count: ${this.clickCount}, Close count: ${this.closeCount}`);
         console.log(`📊 Total events: ${totalEvents}`);
-        console.log(`📊 Elements found - totalEvents: ${!!totalEventsEl}, adViews: ${!!adViewsEl}, adClicks: ${!!adClicksEl}`);
+        console.log(`📊 Elements found - totalEvents: ${!!totalEventsEl}, adViews: ${!!adViewsEl}, adClicks: ${!!adClicksEl}, adCloses: ${!!adClosesEl}`);
         
         if (totalEventsEl) {
             totalEventsEl.textContent = totalEvents;
@@ -438,6 +558,10 @@ class AdManager {
             adClicksEl.textContent = this.clickCount;
             console.log(`📊 Updated adClicks to: ${this.clickCount}`);
         }
+        if (adClosesEl) {
+            adClosesEl.textContent = this.closeCount;
+            console.log(`📊 Updated adCloses to: ${this.closeCount}`);
+        }
     }
 
     // Public methods for external control
@@ -449,16 +573,37 @@ class AdManager {
         return Array.from(this.clickedAds);
     }
 
+    getClosedAds() {
+        return Array.from(this.closedAds);
+    }
+
+    getAdMetrics() {
+        return {
+            views: this.viewCount,
+            clicks: this.clickCount,
+            closes: this.closeCount,
+            viewedAds: this.getViewedAds(),
+            clickedAds: this.getClickedAds(),
+            closedAds: this.getClosedAds(),
+            adViewTimestamps: { ...this.adViewTimestamps }
+        };
+    }
+
     resetMetrics() {
         this.viewedAds.clear();
         this.clickedAds.clear();
+        this.closedAds.clear();
         this.viewCount = 0;
         this.clickCount = 0;
+        this.closeCount = 0;
+        this.adViewTimestamps = {};
+        this.stickyAdCloseCount = 0;
+        this.stickyAdsBlocked = false;
         this.updateMetricsDisplay();
         
         // Remove visual indicators
         this.adElements.forEach(ad => {
-            ad.classList.remove('viewed', 'clicked');
+            ad.classList.remove('viewed', 'clicked', 'closed');
         });
     }
 }
@@ -466,17 +611,28 @@ class AdManager {
 // Global functions for HTML onclick handlers
 window.closeStickyAd = function() {
     const stickyAd = document.getElementById('sticky-ad');
-    if (stickyAd) {
+    if (stickyAd && window.adManager) {
+        window.adManager.handleAdClose(stickyAd);
+        // Always allow user to close the ad
         stickyAd.classList.remove('visible');
-        if (window.adManager) {
-            window.adManager.stickyAdVisible = false;
-        }
+        window.adManager.stickyAdVisible = false;
     }
 };
 
 window.closeInterstitial = function() {
-    if (window.adManager) {
+    const modal = document.getElementById('interstitial-modal');
+    if (modal && window.adManager) {
+        window.adManager.handleAdClose(modal);
         window.adManager.closeInterstitial();
+    }
+};
+
+window.closeCatBoxAd = function() {
+    const catBoxAd = document.getElementById('cat-box-interest-ad');
+    if (catBoxAd && window.adManager) {
+        window.adManager.handleAdClose(catBoxAd);
+        catBoxAd.classList.remove('visible');
+        window.adManager.catBoxAdVisible = false;
     }
 };
 

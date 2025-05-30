@@ -63,14 +63,17 @@ CREATE TABLE IF NOT EXISTS ad_events (
     id BIGSERIAL PRIMARY KEY,
     event_id BIGINT REFERENCES events_raw(id) ON DELETE CASCADE,
     ad_id VARCHAR(255) NOT NULL,
+    ad_name VARCHAR(255),
     ad_type VARCHAR(50) NOT NULL CHECK (ad_type IN ('banner', 'sticky', 'interstitial')),
-    event_type VARCHAR(50) NOT NULL CHECK (event_type IN ('ad_view', 'ad_click')),
+    event_type VARCHAR(50) NOT NULL CHECK (event_type IN ('ad_view', 'ad_click', 'ad_close')),
     session_id VARCHAR(255) NOT NULL,
     user_id VARCHAR(255) NOT NULL,
     tracking_mode VARCHAR(20) NOT NULL,
     viewport_percentage INTEGER CHECK (viewport_percentage >= 0 AND viewport_percentage <= 100),
     click_x INTEGER,
     click_y INTEGER,
+    ad_view_timestamp BIGINT, -- When the ad was first viewed
+    time_to_close_ms INTEGER, -- Time from view to close in milliseconds
     timestamp BIGINT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

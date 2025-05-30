@@ -535,3 +535,96 @@ footer {
         font-size: 1rem;
     }
 }
+
+/* Video Content Styles */
+.video-content-wrapper {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.video-content-wrapper h3 {
+    color: #1a73e8;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.video-player {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    max-width: 100%;
+}
+
+.video-player:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.video-thumbnail {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-width: 500px;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    transition: background 0.2s ease;
+}
+
+.video-player:hover .video-overlay {
+    background: rgba(0,0,0,0.4);
+}
+
+.play-button {
+    transition: transform 0.2s ease;
+}
+
+.video-player:hover .play-button {
+    transform: scale(1.1);
+}
+
+.video-duration {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.video-description {
+    margin-top: 1rem;
+    color: #666;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* Video click effect */
+.video-player.clicked {
+    animation: videoClick 0.3s ease;
+}
+
+@keyframes videoClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.98); }
+    100% { transform: scale(1); }
+}

@@ -149,7 +149,7 @@ function addDevelopmentHelpers() {
     document.body.appendChild(toggleBtn);
 
     // Console helpers
-    console.log('%c🚀 AdTech Sandbox Debug Mode Enabled', 'color: #4285f4; font-weight: bold;');
+    console.log('%cAdTech Sandbox Debug Mode Enabled', 'color: #4285f4; font-weight: bold;');
     console.log('Available debug commands:');
     console.log('- getAnalyticsSummary(): Get current analytics state');
     console.log('- window.trackingConfig: Access tracking configuration');
@@ -166,3 +166,35 @@ window.addEventListener('error', (event) => {
 window.addEventListener('unhandledrejection', (event) => {
     console.error('Unhandled promise rejection:', event.reason);
 });
+
+// Video Content Interest Tracking
+function handleVideoClick(videoElement) {
+    const videoId = videoElement.dataset.videoId;
+    
+    // Add visual click effect
+    videoElement.classList.add('clicked');
+    setTimeout(() => {
+        videoElement.classList.remove('clicked');
+    }, 300);
+    
+    // Track user interest in video content
+    if (window.trackingConfig) {
+        window.trackingConfig.sendEvent('video_play_attempt', {
+            video_id: videoId,
+            video_title: videoElement.parentElement.querySelector('h3')?.textContent || 'Unknown',
+            content_type: 'educational',
+            user_action: 'play_button_click',
+            timestamp: Date.now()
+        }).catch(console.error);
+    }
+    
+    // Show cat box ad when user shows interest in cat content
+    if (window.adManager) {
+        window.adManager.showCatBoxInterestAd();
+    }
+    
+    console.log(`Video play attempt tracked: ${videoId} - Showing cat box ad due to interest`);
+}
+
+// Make function globally available for HTML onclick
+window.handleVideoClick = handleVideoClick;

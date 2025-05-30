@@ -42,6 +42,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <span id="adClicks" class="metric-value">0</span>
                     </div>
                     <div class="metric-card">
+                        <span class="metric-label">Closes</span>
+                        <span id="adCloses" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-card">
                         <span class="metric-label">Cart</span>
                         <span id="cartItems" class="metric-value">0</span>
                     </div>
@@ -125,6 +129,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         Add to Cart - $<span id="totalPrice">24.99</span>
                     </button>
                     <button id="buyNow" class="btn-secondary btn-large">Buy Now</button>
+                    <button id="viewCart" class="btn-outline btn-large" onclick="window.location.href='cart.html'">
+                        View Cart (<span id="cartItemCount">0</span>)
+                    </button>
                 </div>
 
                 <div class="shipping-info">

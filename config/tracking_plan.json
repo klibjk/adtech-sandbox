@@ -6,6 +6,7 @@
         "description": "Fired when an ad becomes visible in viewport",
         "parameters": {
           "ad_id": { "type": "string", "required": true },
+          "ad_name": { "type": "string", "required": false },
           "ad_type": { "type": "string", "required": true, "enum": ["banner", "sticky", "interstitial"] },
           "viewport_percentage": { "type": "number", "required": true },
           "session_id": { "type": "string", "required": true },
@@ -19,6 +20,7 @@
         "description": "Fired when user clicks on an ad",
         "parameters": {
           "ad_id": { "type": "string", "required": true },
+          "ad_name": { "type": "string", "required": false },
           "ad_type": { "type": "string", "required": true, "enum": ["banner", "sticky", "interstitial"] },
           "session_id": { "type": "string", "required": true },
           "user_id": { "type": "string", "required": true },
@@ -27,6 +29,21 @@
           "page_url": { "type": "string", "required": true },
           "click_x": { "type": "number", "required": false },
           "click_y": { "type": "number", "required": false }
+        }
+      },
+      "ad_close": {
+        "description": "Fired when user closes/dismisses an ad",
+        "parameters": {
+          "ad_id": { "type": "string", "required": true },
+          "ad_name": { "type": "string", "required": false },
+          "ad_type": { "type": "string", "required": true, "enum": ["banner", "sticky", "interstitial"] },
+          "session_id": { "type": "string", "required": true },
+          "user_id": { "type": "string", "required": true },
+          "timestamp": { "type": "number", "required": true },
+          "tracking_mode": { "type": "string", "required": true, "enum": ["cookie", "cookieless"] },
+          "page_url": { "type": "string", "required": true },
+          "ad_view_timestamp": { "type": "number", "required": true },
+          "time_to_close_ms": { "type": "number", "required": true }
         }
       },
       "web_vitals": {

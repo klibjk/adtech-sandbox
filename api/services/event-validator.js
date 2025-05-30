@@ -94,7 +94,8 @@ export class EventValidator {
             session_id: 255,
             user_id: 255,
             page_url: 2048,
-            user_agent: 1024
+            user_agent: 1024,
+            ad_name: 255
         };
 
         Object.entries(stringFields).forEach(([field, maxLength]) => {
@@ -181,7 +182,7 @@ export class EventValidator {
         });
 
         // Ensure numeric values are actually numbers
-        const numericFields = ['timestamp', 'viewport_percentage', 'click_x', 'click_y', 'metric_value'];
+        const numericFields = ['timestamp', 'viewport_percentage', 'click_x', 'click_y', 'metric_value', 'ad_view_timestamp', 'time_to_close_ms'];
         numericFields.forEach(field => {
             if (sanitized[field] !== undefined && sanitized[field] !== null) {
                 const num = Number(sanitized[field]);

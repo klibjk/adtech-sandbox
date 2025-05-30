@@ -51,6 +51,7 @@ if (process.env.NODE_ENV !== 'production') {
     const frontendPath = join(__dirname, '../frontend');
     const adImagesPath = join(__dirname, '../ad-images');
     const productImagesPath = join(__dirname, '../product-images');
+    const bodyContentImagesPath = join(__dirname, '../body-content-images');
     
     // Serve frontend files
     app.use(express.static(frontendPath));
@@ -61,10 +62,13 @@ if (process.env.NODE_ENV !== 'production') {
     // Serve product images from product-images directory
     app.use('/product-images', express.static(productImagesPath));
     
+    // Serve body content images from body-content-images directory
+    app.use('/body-content-images', express.static(bodyContentImagesPath));
+    
     // Catch-all for SPA routing (must be last)
     app.get('*', (req, res) => {
         // Don't override API routes or static assets
-        if (req.path.startsWith('/api/') || req.path.startsWith('/ad-images/')) {
+        if (req.path.startsWith('/api/') || req.path.startsWith('/ad-images/') || req.path.startsWith('/body-content-images/')) {
             return res.status(404).json({ error: 'Not found' });
         }
         res.sendFile(join(frontendPath, 'index.html'));
